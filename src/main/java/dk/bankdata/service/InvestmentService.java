@@ -74,6 +74,8 @@ public class InvestmentService {
     transaction.setDescription("Køb af aktie " + shareEntity.getName());
     transaction.setTransactionCategory(TransactionCategory.INVESTMENT);
     transactionService.createTransaction(transaction);
+
+    accountAktiesparekonto.setBalance(accountAktiesparekonto.getBalance() - transaction.getAmount());
   }
 
   @Transactional
