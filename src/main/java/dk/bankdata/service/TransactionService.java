@@ -1,6 +1,7 @@
 package dk.bankdata.service;
 
 import dk.bankdata.model.Transaction;
+import dk.bankdata.model.TransactionCategory;
 import java.util.List;
 import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
@@ -29,5 +30,15 @@ public class TransactionService {
   public Transaction createTransaction(Transaction transaction) {
     entityManager.persist(transaction);
     return transaction;
+  }
+
+  public List<Transaction> getTransactionsForAccountByCategory(String accountId, TransactionCategory category) {
+    TypedQuery<Transaction> namedQuery =
+            entityManager.createNamedQuery("Transaction.fetchByCategory", Transaction.class);
+
+    namedQuery.setParameter("accountId", UUID.fromString(accountId));
+    namedQuery.setParameter("category", category);
+
+    return namedQuery.getResultList();
   }
 }

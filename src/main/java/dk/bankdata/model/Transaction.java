@@ -11,7 +11,10 @@ import org.hibernate.annotations.GenericGenerator;
       name = "Transaction.getTransactionsForAccount",
       query =
           "SELECT t FROM Transaction t WHERE t.accountFrom.id = :accountId OR t.accountTo.id = :accountId"),
-  @NamedQuery(name = "Transaction.getTransactions", query = "SELECT t FROM Transaction t")
+  @NamedQuery(name = "Transaction.getTransactions",
+          query = "SELECT t FROM Transaction t"),
+  @NamedQuery(name = "Transaction.fetchByCategory",
+          query = "SELECT t FROM Transaction t WHERE t.transactionCategory = :category AND t.accountFrom.id = :accountId OR t.accountTo.id = :accountId")
 })
 public class Transaction {
   @Id
