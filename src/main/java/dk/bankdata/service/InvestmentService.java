@@ -120,6 +120,6 @@ public class InvestmentService {
       tax = profitMargin * TAX;
     }
 
-    accountAktiesparekonto.setBalance(accountAktiesparekonto.getBalance() - tax);
+    accountService.subtractFromBalance(accountAktiesparekonto, tax);
   }
 }
