@@ -25,8 +25,7 @@ public class AccountResource {
   @Produces(MediaType.APPLICATION_JSON)
   public List<Account> getAccounts() {
     LOGGER.info("Fetching accounts");
-    return Stream.concat(
-            accountService.getAccounts().stream(), accountService.getAccounts().stream())
+    return accountService.getAccounts().stream()
         .sorted(Comparator.comparing(Account::getName))
         .collect(Collectors.toList());
   }
