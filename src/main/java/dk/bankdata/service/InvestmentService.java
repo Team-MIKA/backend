@@ -14,6 +14,8 @@ import javax.transaction.Transactional;
 @ApplicationScoped
 public class InvestmentService {
 
+  public static final double TOPSKAT = 0.41;
+  public static final double TAX = 0.21;
   @Inject EntityManager entityManager;
   @Inject TransactionService transactionService;
   @Inject AccountService accountService;
@@ -75,14 +77,13 @@ public class InvestmentService {
     transaction.setTransactionCategory(TransactionCategory.INVESTMENT);
     transactionService.createTransaction(transaction);
 
-    accountAktiesparekonto.setBalance(accountAktiesparekonto.getBalance() - transaction.getAmount());
+    accountAktiesparekonto.setBalance(accountAktiesparekonto.getBalance() + transaction.getAmount());
   }
 
   @Transactional
   public void sellOwnedShareById(String ownedShareId) {
     OwnedShare ownedShareEntity =
         entityManager.find(OwnedShare.class, UUID.fromString(ownedShareId));
-
     Account accountAktiesparekonto = accountService.getAccountAktiesparekonto();
     Account accountBoersen = accountService.getAccountBoersen();
     accountAktiesparekonto.setBalance(
@@ -100,6 +101,25 @@ public class InvestmentService {
     transaction.setAccountTo(accountBoersen);
     transaction.setTransactionCategory(TransactionCategory.INVESTMENT);
     transactionService.createTransaction(transaction);
+
+    payTax(accountAktiesparekonto, ownedShareEntity, transaction);
+
     entityManager.remove(ownedShareEntity);
+  }
+
+  private void payTax(Account accountAktiesparekonto, OwnedShare share, Transaction transaction) {
+    double buyPrice = share.getBuyPrice();
+    var avance = transaction.getAmount() - buyPrice;
+    var profitMargin = avance / transaction.getAmount();
+
+    double tax = 0;
+    if (profitMargin > 0.5){
+      tax = profitMargin * TOPSKAT;
+    }
+    else if (profitMargin > 0){
+      tax = profitMargin * TAX;
+    }
+
+    accountAktiesparekonto.setBalance(accountAktiesparekonto.getBalance() - tax);
   }
 }
